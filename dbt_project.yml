@@ -1,17 +1,16 @@
-
-# Name your project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
-name: 'my_new_project'
+# ------------------------------------------------------------------------
+# Project Configuration
+# ------------------------------------------------------------------------
+name: 'recove_trends'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
+# This tells dbt Cloud which connection to use (matches your setup)
 profile: 'default'
 
-# These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
+# ------------------------------------------------------------------------
+# Directory Paths
+# ------------------------------------------------------------------------
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -19,24 +18,30 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
-
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
-
-# In dbt, the default materialization for a model is a view. This means, when you run 
-# dbt run or dbt build, all of your models will be built as a view in your data platform. 
-# The configuration below will override this setting for models in the example folder to 
-# instead be materialized as tables. Any models you add to the root of the models folder will 
-# continue to be built as views. These settings can be overridden in the individual model files
-# using the `{{ config(...) }}` macro.
-
+# ------------------------------------------------------------------------
+# Default Model Configurations
+# ------------------------------------------------------------------------
 models:
-  my_new_project:
-    # Applies to all files under models/example/
-    example:
-      +materialized: table
+  recove_analytics:
+    # This ensures any models you build default to Tables rather than Views
+    +materialized: table
+
+# ------------------------------------------------------------------------
+# Global Project Variables
+# ------------------------------------------------------------------------
+vars:
+  lookback_hours: 24
+  attribution_lookback_hours: 48
+  click_out_multiplier: 1
+  saved_item_multiplier: 3
+  image_area_multiplier: 2
+  minimum_token_length: 2
+  ngrams_n: 3
+  stop_words: [
+    'a', 'an', 'the', 'and', 'or', 'but', 'if', 'because', 'as', 'what', 'when', 'where', 'how', 'why', 'who', 'which', 'this', 'that', 'these', 'those', 'then', 'just', 'so', 'than', 'such', 'both', 'through', 'about', 'for', 'is', 'of', 'while', 'during', 'to', 'from', 'in', 'out', 'on', 'off', 'over', 'under', 'with', 'at', 'by', 'into', 'onto', 'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'he', 'him', 'his', 'she', 'her', 'hers', 'it', 'its', 'they', 'them', 'their', 'am', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'buy', 'shop', 'get', 'look', 'looking', 'find', 'online', 'store', 'sale', 'cheap', 'discount', 'free', 'shipping', 'price', 'new', 'style', 'fashion', 'collection', 'size', 'fit', 'apparel', 'clothing', 'clothes', 'accessories', 'outfit', 'wear', 'item', 'items', 'product', 'men', 'mens', 'women', 'womens', 'boy', 'boys', 'girl', 'girls', 'kids', 'baby', 'toddler', 'unisex', 'male', 'female'
+  ]
