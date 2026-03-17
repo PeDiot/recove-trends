@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: recove_backup
+    database: recove-450509
+    schema: backup
+    tables:
+      - name: search_history
+      - name: search_area_history
+      - name: click_out
+      - name: saved
+      - name: excluded_user_ids
