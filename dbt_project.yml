@@ -42,6 +42,7 @@ vars:
   image_area_multiplier: 2
   minimum_token_length: 2
   ngrams_n: 3
+  top_k: 50
   stop_words: [
     'a', 'an', 'the', 'and', 'or', 'but', 'if', 'because', 'as', 'what', 'when', 'where', 'how', 'why', 'who', 'which', 'this', 'that', 'these', 'those', 'then', 'just', 'so', 'than', 'such', 'both', 'through', 'about', 'for', 'is', 'of', 'while', 'during', 'to', 'from', 'in', 'out', 'on', 'off', 'over', 'under', 'with', 'at', 'by', 'into', 'onto', 'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'he', 'him', 'his', 'she', 'her', 'hers', 'it', 'its', 'they', 'them', 'their', 'am', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'buy', 'shop', 'get', 'look', 'looking', 'find', 'online', 'store', 'sale', 'cheap', 'discount', 'free', 'shipping', 'price', 'new', 'style', 'fashion', 'collection', 'size', 'fit', 'apparel', 'clothing', 'clothes', 'accessories', 'outfit', 'wear', 'item', 'items', 'product', 'men', 'mens', 'women', 'womens', 'boy', 'boys', 'girl', 'girls', 'kids', 'baby', 'toddler', 'unisex', 'male', 'female'
   ]

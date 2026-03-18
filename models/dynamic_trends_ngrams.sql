@@ -1,7 +1,7 @@
 {{
     config(
         materialized="table",
-        alias="trends_" ~ var("ngrams_n") ~ "grams_" ~ var("lookback_hours") ~ "h",
+        alias="trends_" ~ var("ngrams_n") ~ "grams_" ~ var("lookback_hours") ~ "h_top" ~ var("top_k"),
     )
 }}
 
@@ -194,3 +194,5 @@ select
     num_converting_users,
     engagement_score
 from aggregatedstats
+order by engagement_score desc
+limit {{ var("top_k") }}
