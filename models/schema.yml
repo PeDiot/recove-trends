@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: dynamic_trends_ngrams
+    description: "Calculates the top trending search n-grams and their engagement scores over a dynamic lookback window."
+    columns:
+      - name: ngram
+        description: "The sequence of words extracted from user searches."
+        tests:
+          - unique
+          - not_null
+
+      - name: engagement_score
+        description: "A weighted score based on clicks and saves."
+        tests:
+          - not_null
