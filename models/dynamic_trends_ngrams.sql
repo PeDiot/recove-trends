@@ -1,7 +1,12 @@
 {{
     config(
         materialized="table",
-        alias="trends_" ~ var("ngrams_n") ~ "grams_" ~ var("lookback_hours") ~ "h_top" ~ var("top_k"),
+        alias="trends_"
+        ~ var("ngrams_n")
+        ~ "grams_"
+        ~ var("lookback_hours")
+        ~ "h_top"
+        ~ var("top_k"),
     )
 }}
 
