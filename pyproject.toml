@@ -1,0 +1,13 @@
+[project]
+name = "recove-trends"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = [
+    "pydantic>=2.12.5",
+    "dagster",
+    "dagster-webserver",
+    "requests",
+    "google-cloud-bigquery",
+    "google-auth",
+    "slack_sdk",
+]
