@@ -204,8 +204,9 @@ def run_pipeline():
     send_slack_alert(trends=trends)
 
 
-schedule = dg.ScheduleDefinition(job=run_pipeline, cron_schedule="*/3 * * * *")
+schedule = dg.ScheduleDefinition(job=run_pipeline, cron_schedule="0 0 * * *")
 
 defs = dg.Definitions(
-    jobs=[run_pipeline], schedules=[schedule],
+    jobs=[run_pipeline],
+    schedules=[schedule],
 )
