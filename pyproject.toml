@@ -11,6 +11,7 @@ dependencies = [
     "google-auth",
     "slack_sdk",
     "python-decouple>=3.8",
+    "dagster-cloud>=1.12.1",
 ]
 
 [tool.dagster]
