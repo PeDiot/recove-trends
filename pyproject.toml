@@ -12,3 +12,6 @@ dependencies = [
     "slack_sdk",
     "python-decouple>=3.8",
 ]
+
+[tool.dagster]
+module_name = "scripts.pipeline"
