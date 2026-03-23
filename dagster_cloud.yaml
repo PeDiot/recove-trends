@@ -1,0 +1,4 @@
+locations:
+- code_source:
+    module_name: scripts.pipeline
+  location_name: scripts_pipeline
