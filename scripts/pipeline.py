@@ -31,7 +31,6 @@ class TrendsConfig(Config):
     ngrams_n: int = 3
     top_k: int = 10
     lookback_hours: int = 48
-    normalize_score: bool = False
 
 
 class Trend(BaseModel):
@@ -41,10 +40,23 @@ class Trend(BaseModel):
     num_save_events: int
     num_converting_users: int
     engagement_score: float
+    normalized_score: float
+
+    @classmethod
+    def from_row(cls, row: bigquery.Row) -> "Trend":
+        return cls(
+            ngram=row.ngram,
+            num_search_query_events=row.num_search_query_events,
+            num_click_out_events=row.num_click_out_events,
+            num_save_events=row.num_save_events,
+            num_converting_users=row.num_converting_users,
+            engagement_score=row.engagement_score,
+            normalized_score=row.normalized_score,
+        )
 
     def to_message(self, rank: int) -> str:
         return (
-            f"{rank}. *{self.ngram}* — Score: {self.engagement_score:,}\n"
+            f"{rank}. *{self.ngram}* — Score: {self.normalized_score:.2%}\n"
             f"    • {self.num_search_query_events:,} searches\n"
             f"    • {self.num_click_out_events:,} click-outs\n"
             f"    • {self.num_save_events:,} saves\n"
@@ -159,22 +171,9 @@ def fetch_top_trends(config: TrendsConfig, dbt_success: bool) -> List[Trend]:
 
     client = initialize_bq_client()
     query = create_bq_retrieval_query(config, normalize_score=config.normalize_score)
+    rows = client.query(query).result()
 
-    results = client.query(query).result()
-
-    trends = []
-    for row in results:
-        trend = Trend(
-            ngram=row.ngram,
-            num_search_query_events=row.num_search_query_events,
-            num_click_out_events=row.num_click_out_events,
-            num_save_events=row.num_save_events,
-            num_converting_users=row.num_converting_users,
-            engagement_score=row.engagement_score,
-        )
-        trends.append(trend)
-
-    return trends
+    return [Trend.from_row(row) for row in rows]
 
 
 @op
