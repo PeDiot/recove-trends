@@ -10,3 +10,4 @@ dbt_internal_packages/
 .ruff_cache/
 secrets/
 __pycache__/
+.tmp*
