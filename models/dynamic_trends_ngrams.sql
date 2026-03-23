@@ -189,6 +189,19 @@ with
 
         from extractedngrams
         group by ngram
+    ),
+
+    top_k_results as (
+        select
+            ngram,
+            num_search_query_events,
+            num_click_out_events,
+            num_save_events,
+            num_converting_users,
+            engagement_score
+        from aggregatedstats
+        order by engagement_score desc
+        limit {{ var("top_k") }}
     )
 
 select
@@ -197,7 +210,17 @@ select
     num_click_out_events,
     num_save_events,
     num_converting_users,
-    engagement_score
-from aggregatedstats
+    engagement_score,
+    cast(
+        coalesce(
+            round(
+                (engagement_score - min(engagement_score) over ()) / nullif(
+                    max(engagement_score) over () - min(engagement_score) over (), 0
+                ),
+                4
+            ),
+            0
+        ) as float64
+    ) as normalized_score
+from top_k_results
 order by engagement_score desc
-limit {{ var("top_k") }}
