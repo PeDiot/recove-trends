@@ -28,8 +28,8 @@ GCP_CREDENTIALS_JSON = config("GCP_CREDENTIALS_JSON")
 
 
 class TrendsConfig(Config):
-    ngrams_n: int = 3
-    lookback_hours: int = 48
+    ngrams_n: int = 2
+    lookback_hours: int = 24
     top_k: int = 100
     top_k_display: int = 10
 
@@ -61,7 +61,7 @@ class Trend(BaseModel):
             f"    • Engagement: *{self.normalized_score:.2%}*\n"
             f"    • 🔎 {self.num_search_query_events:,} | "
             f"🔗 {self.num_click_out_events:,} | "
-            f"❤️ {self.num_save_events:,} | "
+            f"🩶 {self.num_save_events:,} | "
             f"👥 {self.num_converting_users:,}\n\n"
         )
 
@@ -182,11 +182,10 @@ def fetch_top_trends(config: TrendsConfig, dbt_success: bool) -> List[Trend]:
 @op
 def send_slack_alert(config: TrendsConfig, trends: List[Trend]):
     client = WebClient(token=SLACK_BOT_TOKEN)
-
     lookback_display = format_lookback_hours(config.lookback_hours)
 
     message = (
-        f"📈 *Top {config.top_k} Recove Trends "
+        f"💅🏻 *Top {config.top_k_display} Recove Trends "
         f"over the last {lookback_display}*\n\n"
     )
 
