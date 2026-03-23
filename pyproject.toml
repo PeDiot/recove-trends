@@ -10,4 +10,5 @@ dependencies = [
     "google-cloud-bigquery",
     "google-auth",
     "slack_sdk",
+    "python-decouple>=3.8",
 ]
