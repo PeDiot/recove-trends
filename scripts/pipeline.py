@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import time, requests, json
 from decouple import config
 
-from dagster import Config, get_dagster_logger, job, op, ScheduleDefinition
+import dagster as dg
 
 from google.cloud import bigquery
 from google.oauth2 import service_account
@@ -27,7 +27,7 @@ GCP_DATASET_ID = config("GCP_DATASET_ID")
 GCP_CREDENTIALS_JSON = config("GCP_CREDENTIALS_JSON")
 
 
-class TrendsConfig(Config):
+class TrendsConfig(dg.Config):
     ngrams_n: int = 2
     lookback_hours: int = 24
     top_k: int = 100
@@ -117,9 +117,9 @@ def format_lookback_hours(lookback_hours: int) -> str:
     return f"{lookback_hours} hours"
 
 
-@op
+@dg.op
 def trigger_dbt_job(config: TrendsConfig) -> int:
-    logger = get_dagster_logger()
+    logger = dg.get_dagster_logger()
 
     headers = {
         "Content-Type": "application/json",
@@ -140,9 +140,9 @@ def trigger_dbt_job(config: TrendsConfig) -> int:
     return run_id
 
 
-@op
+@dg.op
 def wait_for_dbt_job(run_id: int) -> bool:
-    logger = get_dagster_logger()
+    logger = dg.get_dagster_logger()
 
     headers = {
         "Accept": "application/json",
@@ -165,7 +165,7 @@ def wait_for_dbt_job(run_id: int) -> bool:
         time.sleep(15)
 
 
-@op
+@dg.op
 def fetch_top_trends(config: TrendsConfig, dbt_success: bool) -> List[Trend]:
     if not dbt_success:
         raise Exception(
@@ -179,7 +179,7 @@ def fetch_top_trends(config: TrendsConfig, dbt_success: bool) -> List[Trend]:
     return [Trend.from_row(row) for row in rows]
 
 
-@op
+@dg.op
 def send_slack_alert(config: TrendsConfig, trends: List[Trend]):
     client = WebClient(token=SLACK_BOT_TOKEN)
     lookback_display = format_lookback_hours(config.lookback_hours)
@@ -193,17 +193,19 @@ def send_slack_alert(config: TrendsConfig, trends: List[Trend]):
         message += trend.to_message(i)
 
     client.chat_postMessage(channel=SLACK_CHANNEL, text=message)
-    get_dagster_logger().info("Slack alert sent successfully!")
+    dg.get_dagster_logger().info("Slack alert sent successfully!")
 
 
-@job
-def daily_trends_pipeline():
+@dg.job
+def run_pipeline():
     run_id = trigger_dbt_job()
     success = wait_for_dbt_job(run_id=run_id)
     trends = fetch_top_trends(dbt_success=success)
     send_slack_alert(trends=trends)
 
 
-daily_schedule = ScheduleDefinition(
-    job=daily_trends_pipeline, cron_schedule="0 0 * * *"
+schedule = dg.ScheduleDefinition(job=run_pipeline, cron_schedule="*/3 * * * *")
+
+defs = dg.Definitions(
+    jobs=[run_pipeline], schedules=[schedule],
 )
