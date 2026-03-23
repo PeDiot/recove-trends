@@ -29,8 +29,9 @@ GCP_CREDENTIALS_JSON = config("GCP_CREDENTIALS_JSON")
 
 class TrendsConfig(Config):
     ngrams_n: int = 3
-    top_k: int = 10
     lookback_hours: int = 48
+    top_k: int = 100
+    top_k_display: int = 10
 
 
 class Trend(BaseModel):
@@ -56,11 +57,12 @@ class Trend(BaseModel):
 
     def to_message(self, rank: int) -> str:
         return (
-            f"{rank}. *{self.ngram}* — Score: {self.normalized_score:.2%}\n"
-            f"    • {self.num_search_query_events:,} searches\n"
-            f"    • {self.num_click_out_events:,} click-outs\n"
-            f"    • {self.num_save_events:,} saves\n"
-            f"    • {self.num_converting_users:,} users\n\n"
+            f"{rank}. *{self.ngram}*\n"
+            f"    • Engagement: *{self.normalized_score:.2%}*\n"
+            f"    • 🔎 {self.num_search_query_events:,} | "
+            f"🔗 {self.num_click_out_events:,} | "
+            f"❤️ {self.num_save_events:,} | "
+            f"👥 {self.num_converting_users:,}\n\n"
         )
 
 
@@ -103,6 +105,7 @@ engagement_score,
 normalized_score
 FROM `{GCP_PROJECT_ID}.{GCP_DATASET_ID}.{table_name}`
 ORDER BY engagement_score DESC
+LIMIT {config.top_k_display};
     """
 
 
@@ -170,7 +173,7 @@ def fetch_top_trends(config: TrendsConfig, dbt_success: bool) -> List[Trend]:
         )
 
     client = initialize_bq_client()
-    query = create_bq_retrieval_query(config, normalize_score=config.normalize_score)
+    query = create_bq_retrieval_query(config)
     rows = client.query(query).result()
 
     return [Trend.from_row(row) for row in rows]
